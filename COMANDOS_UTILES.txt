@@ -3,3 +3,7 @@
 ++ ifconfig (Para conocer nuestra ip y el segmento de la red ejemplo: 192.168.1.102)
 ++ nmap -sP <ip_red, ejemplo: 192.168.1.0/24> (Realiza un barrido en la red realizando ping)
 ++ Nos aparecerá un listado de todos los dispositivos conectados a la red, su ip, frabricante y mac
+++ nmap -sn <ip_red, ejemplo: 192.168.1.0/24> (Realiza un barrido en la red sin realizar pin)
+++ Nos aparecerá un listado de todos los dispositivos conectados a la red, pero solo su ip y la mac
+++ nmap -Pn <ip_equipo, ejemplo: 192.168.1.42> (Realiza un escaneo de los puertos abiertos de una ip asignada a un equipo, ejemplo: pc con windows)
+
