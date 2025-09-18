@@ -8,3 +8,4 @@
 ++ nmap -Pn <ip_equipo, ejemplo: 192.168.1.42> (Realiza un escaneo de los puertos abiertos de una ip asignada a un equipo, ejemplo: pc con windows)
 --- Nos aparecerá un listado de todos los puertos abiertos 
 
+
