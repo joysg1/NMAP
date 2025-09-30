@@ -1,5 +1,6 @@
 ++ sudo su (Acceder como root)
 ++ nmap
+++ nmap <ip> (Permite ver los puertos abiertos)
 ++ ifconfig (Para conocer nuestra ip y el segmento de la red ejemplo: 192.168.1.102)
 ++ nmap -sP <ip_red, ejemplo: 192.168.1.0/24> (Realiza un barrido en la red realizando ping)
 --- Nos aparecerá un listado de todos los dispositivos conectados a la red, su ip, frabricante y mac
