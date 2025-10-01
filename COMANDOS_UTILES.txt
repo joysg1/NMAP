@@ -13,6 +13,9 @@
 ++ nmap -Pn <ip_equipo, ejemplo: 192.168.1.42> (Realiza un escaneo de los puertos abiertos de una ip asignada a un equipo, ejemplo: pc con windows)
 --- Nos aparecerá un listado de todos los puertos abiertos 
 
+++ nmap -sV <ip_servidor> (Nos muestra información sobre los puertos abiertos y versiones de software)
+
+
 ++ nmap -A <dirección> ---> Realiza un escaneo agresivo, detectando servicios, versiones y sistema operativo 
 
 
