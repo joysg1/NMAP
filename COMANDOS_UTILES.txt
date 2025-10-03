@@ -15,9 +15,10 @@
 
 ++ nmap -sV <ip_equipo> (Nos muestra información sobre los puertos abiertos y versiones de software)
 
-
 ++ nmap -A <dirección> (Realiza un escaneo agresivo, detectando servicios, versiones y sistema operativo)
 
 ++ nmap <ip> -p <num_puerto> (Realiza un escaneo sobre un puerto especifico bajo una dirección ip)
+
+++ nmap <ip> -p- (Realiza un escaneo sobre todos los puertos posibles bajo una dirección ip)
 
 
