@@ -17,8 +17,8 @@
 
 ++ nmap -A <dirección> (Realiza un escaneo agresivo, detectando servicios, versiones y sistema operativo)
 
-++ nmap <ip> -p <num_puerto> (Realiza un escaneo sobre un puerto especifico bajo una dirección ip)
+++ nmap <ip> -p <num_puerto> (Realiza un escaneo para detectar si un puerto en específico está abierto bajo una dirección ip)
 
-++ nmap <ip> -p- (Realiza un escaneo sobre todos los puertos posibles bajo una dirección ip)
+++ nmap <ip> -p- (Realiza un escaneo sobre todos los posibles puertos abiertos bajo una dirección ip)
 
 
