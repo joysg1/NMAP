@@ -35,6 +35,7 @@
 
 ++ nmap -sS <ip> -O -osscan-guess (Permite detectar la versión del S.O.)
 
+++ nmap -sS <ip> -sV (Permite ver los servicios y sus versiones)
 
 ++ nmap -sV <ip_equipo> (Nos muestra información sobre los puertos abiertos y versiones de software)
 
