@@ -31,6 +31,11 @@
 --- 143 IMAP
 --- 139 NETBIOS
 
+++ nmap -sS <ip> -O (Permite detectar la versión del S.O.)
+
+++ nmap -sS <ip> -O -osscan-guess (Permite detectar la versión del S.O.)
+
+
 ++ nmap -sV <ip_equipo> (Nos muestra información sobre los puertos abiertos y versiones de software)
 
 ++ nmap -A <dirección> (Realiza un escaneo agresivo, detectando servicios, versiones y sistema operativo)
