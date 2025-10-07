@@ -13,6 +13,24 @@
 ++ nmap -Pn <ip_equipo, ejemplo: 192.168.1.42> (Realiza un escaneo de los puertos abiertos de una ip asignada a un equipo, ejemplo: pc con windows)
 --- Nos aparecerá un listado de todos los puertos abiertos 
 
+++ nmap -sS <ip> --top-ports (Realiza un escaneo de los puertos populares)
+--- 21 FTP
+--- 22 SSH
+--- 23 TELNET
+--- 25 SMTP
+--- 80 HTTP
+--- 110 POP3
+--- 443 HTTPS
+--- 445 SMB
+--- 902 VMWARE
+--- 1433 MSSQL
+--- 1521 ORACLE
+--- 3306 MYSQL
+--- 5900 VNC
+--- 8080 PROXY
+--- 143 IMAP
+--- 139 NETBIOS
+
 ++ nmap -sV <ip_equipo> (Nos muestra información sobre los puertos abiertos y versiones de software)
 
 ++ nmap -A <dirección> (Realiza un escaneo agresivo, detectando servicios, versiones y sistema operativo)
