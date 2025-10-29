@@ -1,1 +1,9 @@
 ++ nmap -sS -sV -O <ip> -oX M1 ----> Permite realizar un escaneo y guardar los resultados en un archivo xml
+
+++ msfconsole 
+
+++ db_import <archivo_en_este_caso_M1> ----> Permite importar los resultados obtenidos del scan con nmap
+
+++ db_nmap -sS -sV  -O <ip> ----> Permite realizar el escaneo
+
+
