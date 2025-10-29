@@ -1,0 +1,1 @@
+++ nmap -sS -sV -O <ip> -oX M1 ----> Permite realizar un escaneo y guardar los resultados en un archivo xml
