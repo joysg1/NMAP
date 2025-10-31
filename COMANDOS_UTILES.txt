@@ -45,4 +45,23 @@
 
 ++ nmap <ip> -p- (Realiza un escaneo sobre todos los posibles puertos abiertos bajo una dirección ip)
 
+++ nmap -T0 -sn <ip> (Realiza un escaneo lento para evitar las detecciones de sistemas IDS)
+
+++ nmap -T5 -sn <ip> (Realiza un escaneo extremadamente rápido, pero puede
+ocasionar saturación en la red. No obstantante es ideal para redes grandes.)
+
+++ nmap -T4 -sn <ip> (Realiza un escaneo agresivo)
+
+++ nmap -T3 -sn <ip> (Realiza un escaneo normal)
+
+++ nmap -T2 -sn <ip> (Realiza un escaneo más lento de lo normal)
+
+++ nmap -T1 -sn <ip> (Realiza un escaneo lento y sigiloso)
+
+
+
+
+
+
+
 
