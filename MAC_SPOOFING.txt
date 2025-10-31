@@ -1,0 +1,7 @@
+++ nmap --spoof-mac 0 <ip> ----> Genera una dirección mac completamente aleatoria para escanear la ip
+
+++ nmap --spoof-mac 00:11 <ip> ----> Genera una dirección mac que comienza con 0:11 y el resto es aleatorio para escanear la ip
+
+++ nmap --spoof-mac <mac> <ip> ----> Usa exactamente la dirección mac especificada para escanear la ip
+
+++ nmap --spoof-mac asus <ip> ---> Usa una dirección mac del fabricante asus para escanear la ip
