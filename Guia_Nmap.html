@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa de Nmap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e, #283593, #3949ab);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(245,245,245,0.95));
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        h1 {
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-size: 2.8rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #5c6bc0;
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        /* Estilos del buscador */
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 18px 60px 18px 25px;
+            font-size: 1.1rem;
+            border: 3px solid #5c6bc0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(92, 107, 192, 0.3);
+            background: white;
+        }
+        
+        .search-box:focus {
+            border-color: #3949ab;
+            box-shadow: 0 6px 20px rgba(57, 73, 171, 0.4);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5c6bc0;
+            font-size: 1.4rem;
+            transition: color 0.3s ease;
+        }
+        
+        .search-box:focus + .search-icon {
+            color: #3949ab;
+        }
+        
+        .search-results {
+            margin-top: 12px;
+            color: #5c6bc0;
+            font-size: 0.95rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            margin: 30px 0;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .no-results h3 {
+            color: #e53935;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .category-card {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .category-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #5c6bc0, #3949ab);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+        }
+        
+        .category-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .category-header h2::before {
+            content: "🔍";
+            margin-right: 12px;
+            font-size: 1.4rem;
+        }
+        
+        .commands-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .command-item {
+            padding: 18px 25px;
+            border-bottom: 1px solid #f1f3f4;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .command-item:last-child {
+            border-bottom: none;
+        }
+        
+        .command-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .command-item::before {
+            content: "➜";
+            position: absolute;
+            left: 10px;
+            color: #5c6bc0;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .command-item:hover::before {
+            transform: translateX(3px);
+            color: #3949ab;
+        }
+        
+        .command {
+            font-family: 'Courier New', monospace;
+            background-color: #e8eaf6;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: #1a237e;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 8px;
+            border-left: 4px solid #5c6bc0;
+        }
+        
+        .command-description {
+            color: #546e7a;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        .command-example {
+            background-color: #f3e5f5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #8e24aa;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #6a1b9a;
+            margin: 8px 0;
+        }
+        
+        .command-output {
+            background-color: #e8f5e8;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #43a047;
+            font-size: 0.9rem;
+        }
+        
+        .output-line {
+            margin-bottom: 3px;
+            padding-left: 10px;
+            position: relative;
+        }
+        
+        .output-line::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #43a047;
+        }
+        
+        .command-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        
+        .tag {
+            background-color: #e8eaf6;
+            color: #3949ab;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .ports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .port-item {
+            background-color: #f3e5f5;
+            padding: 6px 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.85rem;
+            border-left: 3px solid #8e24aa;
+        }
+        
+        .port-number {
+            font-weight: bold;
+            color: #6a1b9a;
+        }
+        
+        .port-service {
+            color: #546e7a;
+            font-size: 0.8rem;
+        }
+        
+        .timing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .timing-item {
+            background-color: #fff3e0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #ffb74d;
+        }
+        
+        .timing-level {
+            font-weight: bold;
+            color: #ef6c00;
+            font-size: 1.1rem;
+        }
+        
+        .timing-description {
+            color: #546e7a;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .warning-note {
+            background-color: #ffebee;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e53935;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        .info-note {
+            background-color: #e3f2fd;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        .highlight {
+            background-color: #fff9c4;
+            border-radius: 3px;
+            padding: 1px 4px;
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            color: white;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .category-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .command-item {
+                padding: 15px 20px;
+            }
+            
+            .ports-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Guía Completa de Nmap</h1>
+            <p class="subtitle">Escaneo de redes y descubrimiento de puertos para auditorías de seguridad</p>
+            
+            <!-- Buscador -->
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-box" placeholder="Buscar comandos, escaneos o técnicas...">
+                <div class="search-icon">🔍</div>
+                <div class="search-results" id="searchResults">Escribe para buscar en la documentación</div>
+            </div>
+        </header>
+        
+        <div class="no-results" id="noResults">
+            <h3>No se encontraron resultados</h3>
+            <p>Intenta con otros términos de búsqueda o revisa las categorías disponibles</p>
+        </div>
+        
+        <!-- Comandos Básicos -->
+        <h2 style="color: white; text-align: center; margin: 50px 0 30px 0; font-size: 2rem;">Comandos Básicos</h2>
+        
+        <div class="content-grid">
+            <div class="category-card" data-category="basico root acceso privilegios">
+                <div class="category-header">
+                    <h2>Configuración Inicial</h2>
+                </div>
+                <div class="category-content">
+                    <ul class="commands-list">
+                        <li class="command-item" data-search="sudo su root acceso privilegios">
+                            <div class="command">sudo su</div>
+                            <div class="command-description">Acceder como usuario root para tener privilegios completos en el sistema</div>
+                            <div class="warning-note">
+                                ⚠️ <strong>Precaución:</strong> Ejecutar comandos como root puede ser peligroso. Usar con responsabilidad.
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Privilegios</span>
+                                <span class="tag">Root</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="ifconfig ip red segmento">
+                            <div class="command">ifconfig</div>
+                            <div class="command-description">Mostrar información de las interfaces de red y direcciones IP</div>
+                            <div class="command-output">
+                                <div class="output-line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</div>
+                                <div class="output-line">inet <strong>192.168.1.102</strong>  netmask 255.255.255.0  broadcast 192.168.1.255</div>
+                                <div class="output-line">Segmento de red: <strong>192.168.1.0/24</strong></div>
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Red</span>
+                                <span class="tag">IP</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap basico escaneo puertos">
+                            <div class="command">nmap &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo básico de puertos abiertos en una dirección IP específica</div>
+                            <div class="command-example">nmap 192.168.1.42</div>
+                            <div class="command-tags">
+                                <span class="tag">Básico</span>
+                                <span class="tag">Puertos</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Descubrimiento de Hosts -->
+        <h2 style="color: white; text-align: center; margin: 50px 0 30px 0; font-size: 2rem;">Descubrimiento de Hosts</h2>
+        
+        <div class="content-grid">
+            <div class="category-card" data-category="descubrimiento hosts ping barrido red">
+                <div class="category-header">
+                    <h2>Escaneo de Red</h2>
+                </div>
+                <div class="category-content">
+                    <ul class="commands-list">
+                        <li class="command-item" data-search="nmap sP ping barrido red dispositivos">
+                            <div class="command">nmap -sP &lt;ip_red&gt;</div>
+                            <div class="command-description">Realiza un barrido en la red enviando paquetes ping para descubrir hosts activos</div>
+                            <div class="command-example">nmap -sP 192.168.1.0/24</div>
+                            <div class="command-output">
+                                <div class="output-line">Host 192.168.1.1 is up (0.0030s latency)</div>
+                                <div class="output-line">MAC Address: AA:BB:CC:DD:EE:FF (TP-Link Technologies)</div>
+                                <div class="output-line">Host 192.168.1.42 is up (0.0015s latency)</div>
+                                <div class="output-line">MAC Address: 11:22:33:44:55:66 (Dell Inc.)</div>
+                            </div>
+                            <div class="info-note">
+                                💡 <strong>Resultado:</strong> Muestra IP, fabricante y dirección MAC de todos los dispositivos conectados
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Ping</span>
+                                <span class="tag">Descubrimiento</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap sn barrido red sin ping">
+                            <div class="command">nmap -sn &lt;ip_red&gt;</div>
+                            <div class="command-description">Realiza un barrido en la red sin enviar paquetes ping (solo descubrimiento)</div>
+                            <div class="command-example">nmap -sn 192.168.1.0/24</div>
+                            <div class="command-output">
+                                <div class="output-line">Host 192.168.1.1 is up</div>
+                                <div class="output-line">MAC Address: AA:BB:CC:DD:EE:FF</div>
+                                <div class="output-line">Host 192.168.1.42 is up</div>
+                                <div class="output-line">MAC Address: 11:22:33:44:55:66</div>
+                            </div>
+                            <div class="info-note">
+                                💡 <strong>Resultado:</strong> Solo muestra IP y MAC address, sin información del fabricante
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Descubrimiento</span>
+                                <span class="tag">Sin Ping</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap Pn escaneo puertos sin ping">
+                            <div class="command">nmap -Pn &lt;ip_equipo&gt;</div>
+                            <div class="command-description">Escanea puertos asumiendo que el host está activo (sin verificación previa)</div>
+                            <div class="command-example">nmap -Pn 192.168.1.42</div>
+                            <div class="command-output">
+                                <div class="output-line">PORT     STATE SERVICE</div>
+                                <div class="output-line">21/tcp   open  ftp</div>
+                                <div class="output-line">80/tcp   open  http</div>
+                                <div class="output-line">443/tcp  open  https</div>
+                                <div class="output-line">3389/tcp open  ms-wbt-server</div>
+                            </div>
+                            <div class="info-note">
+                                💡 <strong>Uso:</strong> Ideal para equipos que bloquean paquetes ping (como Windows)
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Sin Ping</span>
+                                <span class="tag">Puertos</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Escaneo de Puertos -->
+        <h2 style="color: white; text-align: center; margin: 50px 0 30px 0; font-size: 2rem;">Escaneo de Puertos</h2>
+        
+        <div class="content-grid">
+            <div class="category-card" data-category="puertos escaneo servicios top ports">
+                <div class="category-header">
+                    <h2>Escaneo de Puertos Específicos</h2>
+                </div>
+                <div class="category-content">
+                    <ul class="commands-list">
+                        <li class="command-item" data-search="nmap sS top ports populares servicios">
+                            <div class="command">nmap -sS &lt;ip&gt; --top-ports</div>
+                            <div class="command-description">Escaneo de los puertos más comunes y populares</div>
+                            <div class="command-example">nmap -sS 192.168.1.42 --top-ports</div>
+                            <div class="ports-grid">
+                                <div class="port-item">
+                                    <div class="port-number">21</div>
+                                    <div class="port-service">FTP</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">22</div>
+                                    <div class="port-service">SSH</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">23</div>
+                                    <div class="port-service">TELNET</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">25</div>
+                                    <div class="port-service">SMTP</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">80</div>
+                                    <div class="port-service">HTTP</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">110</div>
+                                    <div class="port-service">POP3</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">143</div>
+                                    <div class="port-service">IMAP</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">443</div>
+                                    <div class="port-service">HTTPS</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">445</div>
+                                    <div class="port-service">SMB</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">902</div>
+                                    <div class="port-service">VMWARE</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">1433</div>
+                                    <div class="port-service">MSSQL</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">1521</div>
+                                    <div class="port-service">ORACLE</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">3306</div>
+                                    <div class="port-service">MYSQL</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">5900</div>
+                                    <div class="port-service">VNC</div>
+                                </div>
+                                <div class="port-item">
+                                    <div class="port-number">8080</div>
+                                    <div class="port-service">PROXY</div>
+                                </div>
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Puertos Comunes</span>
+                                <span class="tag">Servicios</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap p puerto especifico">
+                            <div class="command">nmap &lt;ip&gt; -p &lt;puerto&gt;</div>
+                            <div class="command-description">Escaneo de un puerto específico en una dirección IP</div>
+                            <div class="command-example">nmap 192.168.1.42 -p 80</div>
+                            <div class="command-example">nmap 192.168.1.42 -p 22,80,443</div>
+                            <div class="command-tags">
+                                <span class="tag">Puerto Específico</span>
+                                <span class="tag">Focalizado</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap p todos puertos completo">
+                            <div class="command">nmap &lt;ip&gt; -p-</div>
+                            <div class="command-description">Escaneo completo de todos los puertos posibles (1-65535)</div>
+                            <div class="command-example">nmap 192.168.1.42 -p-</div>
+                            <div class="warning-note">
+                                ⏳ <strong>Tiempo:</strong> Este escaneo puede tomar mucho tiempo dependiendo de la red
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Completo</span>
+                                <span class="tag">Todos los Puertos</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detección Avanzada -->
+        <h2 style="color: white; text-align: center; margin: 50px 0 30px 0; font-size: 2rem;">Detección Avanzada</h2>
+        
+        <div class="content-grid">
+            <div class="category-card" data-category="deteccion sistema operativo servicios versiones">
+                <div class="category-header">
+                    <h2>Fingerprinting y Detección</h2>
+                </div>
+                <div class="category-content">
+                    <ul class="commands-list">
+                        <li class="command-item" data-search="nmap sS O deteccion sistema operativo">
+                            <div class="command">nmap -sS &lt;ip&gt; -O</div>
+                            <div class="command-description">Detección del sistema operativo del objetivo</div>
+                            <div class="command-example">nmap -sS 192.168.1.42 -O</div>
+                            <div class="command-output">
+                                <div class="output-line">Device type: general purpose</div>
+                                <div class="output-line">Running: Linux 3.X|4.X</div>
+                                <div class="output-line">OS CPE: cpe:/o:linux:linux_kernel:3 cpe:/o:linux:linux_kernel:4</div>
+                                <div class="output-line">OS details: Linux 3.2 - 4.9</div>
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Sistema Operativo</span>
+                                <span class="tag">Fingerprinting</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap sS O osscan guess deteccion agresiva so">
+                            <div class="command">nmap -sS &lt;ip&gt; -O --osscan-guess</div>
+                            <div class="command-description">Detección agresiva del sistema operativo con conjeturas</div>
+                            <div class="command-example">nmap -sS 192.168.1.42 -O --osscan-guess</div>
+                            <div class="info-note">
+                                💡 <strong>Mejora:</strong> Proporciona mejores conjeturas cuando la detección no es exacta
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Sistema Operativo</span>
+                                <span class="tag">Agresivo</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap sS sV servicios versiones software">
+                            <div class="command">nmap -sS &lt;ip&gt; -sV</div>
+                            <div class="command-description">Detección de versiones de servicios y software</div>
+                            <div class="command-example">nmap -sS 192.168.1.42 -sV</div>
+                            <div class="command-output">
+                                <div class="output-line">22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)</div>
+                                <div class="output-line">80/tcp   open  http    Apache httpd 2.4.29 ((Ubuntu))</div>
+                                <div class="output-line">443/tcp  open  ssl/http Apache httpd 2.4.29 ((Ubuntu))</div>
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Versiones</span>
+                                <span class="tag">Servicios</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap sV informacion detallada servicios">
+                            <div class="command">nmap -sV &lt;ip_equipo&gt;</div>
+                            <div class="command-description">Información detallada sobre puertos abiertos y versiones de software</div>
+                            <div class="command-example">nmap -sV 192.168.1.42</div>
+                            <div class="command-tags">
+                                <span class="tag">Detallado</span>
+                                <span class="tag">Versiones</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap A escaneo agresivo completo">
+                            <div class="command">nmap -A &lt;dirección&gt;</div>
+                            <div class="command-description">Escaneo agresivo que incluye detección de SO, versiones, script scanning y traceroute</div>
+                            <div class="command-example">nmap -A 192.168.1.42</div>
+                            <div class="info-note">
+                                💡 <strong>Completo:</strong> Combina -O, -sV, --script y --traceroute en un solo comando
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Agresivo</span>
+                                <span class="tag">Completo</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timing y Evasión -->
+        <h2 style="color: white; text-align: center; margin: 50px 0 30px 0; font-size: 2rem;">Timing y Evasión</h2>
+        
+        <div class="content-grid">
+            <div class="category-card" data-category="timing velocidad evasión ids stealth">
+                <div class="category-header">
+                    <h2>Control de Velocidad y Evasión</h2>
+                </div>
+                <div class="category-content">
+                    <ul class="commands-list">
+                        <li class="command-item" data-search="nmap T0 lento sigiloso evasion ids">
+                            <div class="command">nmap -T0 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo extremadamente lento para evadir sistemas de detección (IDS)</div>
+                            <div class="command-example">nmap -T0 -sn 192.168.1.0/24</div>
+                            <div class="timing-grid">
+                                <div class="timing-item">
+                                    <div class="timing-level">T0 (Paranoico)</div>
+                                    <div class="timing-description">5 minutos entre envíos</div>
+                                </div>
+                                <div class="timing-item">
+                                    <div class="timing-level">T1 (Sigiloso)</div>
+                                    <div class="timing-description">15 segundos entre envíos</div>
+                                </div>
+                                <div class="timing-item">
+                                    <div class="timing-level">T2 (Educado)</div>
+                                    <div class="timing-description">0.4 segundos entre envíos</div>
+                                </div>
+                                <div class="timing-item">
+                                    <div class="timing-level">T3 (Normal)</div>
+                                    <div class="timing-description">Sin delays artificiales</div>
+                                </div>
+                                <div class="timing-item">
+                                    <div class="timing-level">T4 (Agresivo)</div>
+                                    <div class="timing-description">1.25 segundos por host</div>
+                                </div>
+                                <div class="timing-item">
+                                    <div class="timing-level">T5 (Insano)</div>
+                                    <div class="timing-description">0.3 segundos por host</div>
+                                </div>
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Evasion</span>
+                                <span class="tag">Lento</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap T1 lento sigiloso">
+                            <div class="command">nmap -T1 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo lento y sigiloso</div>
+                            <div class="command-example">nmap -T1 -sn 192.168.1.0/24</div>
+                            <div class="command-tags">
+                                <span class="tag">Sigiloso</span>
+                                <span class="tag">Lento</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap T2 mas lento normal">
+                            <div class="command">nmap -T2 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo más lento de lo normal</div>
+                            <div class="command-example">nmap -T2 -sn 192.168.1.0/24</div>
+                            <div class="command-tags">
+                                <span class="tag">Moderado</span>
+                                <span class="tag">Lento</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap T3 normal estandar">
+                            <div class="command">nmap -T3 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo normal (configuración por defecto)</div>
+                            <div class="command-example">nmap -T3 -sn 192.168.1.0/24</div>
+                            <div class="command-tags">
+                                <span class="tag">Normal</span>
+                                <span class="tag">Estándar</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap T4 agresivo rapido">
+                            <div class="command">nmap -T4 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo agresivo y rápido</div>
+                            <div class="command-example">nmap -T4 -sn 192.168.1.0/24</div>
+                            <div class="command-tags">
+                                <span class="tag">Agresivo</span>
+                                <span class="tag">Rápido</span>
+                            </div>
+                        </li>
+                        <li class="command-item" data-search="nmap T5 extremadamente rapido saturacion">
+                            <div class="command">nmap -T5 -sn &lt;ip&gt;</div>
+                            <div class="command-description">Escaneo extremadamente rápido (puede saturar la red)</div>
+                            <div class="command-example">nmap -T5 -sn 192.168.1.0/24</div>
+                            <div class="warning-note">
+                                ⚠️ <strong>Precaución:</strong> Puede causar saturación en la red, pero es ideal para redes grandes
+                            </div>
+                            <div class="command-tags">
+                                <span class="tag">Extremo</span>
+                                <span class="tag">Rápido</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-note">
+            <p>🔒 <strong>Nota importante:</strong> Esta guía es para fines educativos y auditorías de seguridad autorizadas. Siempre obtener permiso antes de escanear redes.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            const noResults = document.getElementById('noResults');
+            const contentGrid = document.getElementById('contentGrid');
+            const categoryCards = document.querySelectorAll('.category-card');
+            const commandItems = document.querySelectorAll('.command-item');
+            
+            // Función para realizar la búsqueda
+            function performSearch(searchTerm) {
+                searchTerm = searchTerm.toLowerCase().trim();
+                let foundCount = 0;
+                
+                // Si el término de búsqueda está vacío, mostrar todo
+                if (searchTerm === '') {
+                    categoryCards.forEach(card => card.classList.remove('hidden'));
+                    commandItems.forEach(item => {
+                        item.classList.remove('hidden');
+                        // Remover resaltado
+                        const command = item.querySelector('.command');
+                        const description = item.querySelector('.command-description');
+                        if (command) command.innerHTML = command.textContent;
+                        if (description) description.innerHTML = description.textContent;
+                    });
+                    noResults.style.display = 'none';
+                    searchResults.textContent = 'Escribe para buscar en la documentación';
+                    return;
+                }
+                
+                // Buscar en tarjetas de categoría
+                categoryCards.forEach(card => {
+                    const category = card.getAttribute('data-category') || '';
+                    if (category.includes(searchTerm)) {
+                        card.classList.remove('hidden');
+                        foundCount++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+                
+                // Buscar en elementos de comando
+                commandItems.forEach(item => {
+                    const searchData = item.getAttribute('data-search') || '';
+                    const command = item.querySelector('.command');
+                    const description = item.querySelector('.command-description');
+                    
+                    if (searchData.includes(searchTerm) || 
+                        command.textContent.toLowerCase().includes(searchTerm) ||
+                        description.textContent.toLowerCase().includes(searchTerm)) {
+                        
+                        item.classList.remove('hidden');
+                        foundCount++;
+                        
+                        // Resaltar el término de búsqueda
+                        if (command) {
+                            command.innerHTML = highlightText(command.textContent, searchTerm);
+                        }
+                        if (description) {
+                            description.innerHTML = highlightText(description.textContent, searchTerm);
+                        }
+                        
+                        // Asegurarse de que la tarjeta padre sea visible
+                        const parentCard = item.closest('.category-card');
+                        if (parentCard) {
+                            parentCard.classList.remove('hidden');
+                        }
+                    } else {
+                        item.classList.add('hidden');
+                        // Remover resaltado si no coincide
+                        if (command) command.innerHTML = command.textContent;
+                        if (description) description.innerHTML = description.textContent;
+                    }
+                });
+                
+                // Mostrar resultados
+                if (foundCount > 0) {
+                    noResults.style.display = 'none';
+                    searchResults.textContent = `Se encontraron ${foundCount} resultados para "${searchTerm}"`;
+                } else {
+                    noResults.style.display = 'block';
+                    searchResults.textContent = `No se encontraron resultados para "${searchTerm}"`;
+                }
+            }
+            
+            // Función para resaltar texto
+            function highlightText(text, searchTerm) {
+                if (!searchTerm) return text;
+                
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            }
+            
+            // Event listener para el campo de búsqueda
+            searchInput.addEventListener('input', function() {
+                performSearch(this.value);
+            });
+            
+            // Event listener para la tecla Escape
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    performSearch('');
+                }
+            });
+            
+            // Focus automático en el buscador
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>
